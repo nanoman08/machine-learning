@@ -68,7 +68,9 @@ def ModelComplexity(X, y):
         The learning and testing errors rates are then plotted. """
     
     # Create 10 cross-validation sets for training and testing
-    cv = ShuffleSplit(X.shape[0], n_iter = 10, test_size = 0.2, random_state = 0)
+    cv = ShuffleSplit(X.shape[0], n_iter = 10, test_size = 0.2, random_state = 13)
+    print "cv:"    
+    print cv
 
     # Vary the max_depth parameter from 1 to 10
     max_depth = np.arange(1,11)
@@ -124,3 +126,6 @@ def PredictTrials(X, y, fitter, data):
 
     # Display price range
     print "\nRange in prices: ${:,.2f}".format(max(prices) - min(prices))
+    
+    
+    
