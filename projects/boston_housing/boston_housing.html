@@ -205,7 +205,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[40]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="c"># Import libraries necessary for this project</span>
@@ -906,25 +906,25 @@ AAAASUVORK5CYII=
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="c"># TODO: Minimum price of the data</span>
-<span class="n">minimum_price</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+<span class="n">minimum_price</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">prices</span><span class="p">)</span>
 
 
 
 <span class="c"># TODO: Maximum price of the data</span>
-<span class="n">maximum_price</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="n">maximum_price</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">prices</span><span class="p">)</span>
 
 <span class="c"># TODO: Mean price of the data</span>
-<span class="n">mean_price</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">mean_price</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">prices</span><span class="p">)</span>
 
-<span class="n">mean_room</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="s">&#39;RM&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-<span class="n">mean_LSTAT</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="s">&#39;LSTAT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-<span class="n">mean_PTRATIO</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="s">&#39;PTRATIO&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">mean_room</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;RM&#39;</span><span class="p">])</span>
+<span class="n">mean_LSTAT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;LSTAT&#39;</span><span class="p">])</span>
+<span class="n">mean_PTRATIO</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;PTRATIO&#39;</span><span class="p">])</span>
 
 <span class="c"># TODO: Median price of the data</span>
-<span class="n">median_price</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">median</span><span class="p">()</span>
+<span class="n">median_price</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">prices</span><span class="p">)</span>
 
 <span class="c"># TODO: Standard deviation of prices of the data</span>
-<span class="n">std_price</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+<span class="n">std_price</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">prices</span><span class="p">)</span>
 
 
 
@@ -959,7 +959,7 @@ Minimum price: $105,000.00
 Maximum price: $1,024,800.00
 Mean price: $454,342.94
 Median price $438,900.00
-Standard deviation of prices: $165,340.28
+Standard deviation of prices: $165,171.13
 Mean room number: 6.24
 Mean LSTAT: 12.94
 Mean PTRATIO: 18.52
@@ -1003,7 +1003,7 @@ max      8.398000   37.970000   22.000000
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer: </strong>For "RM", the larger "RM" is, the more rooms a house has, then it should worth more, so the "MDEV" is higher.</p>
-<p>For "LSTAT", if it is higher, the howeowner is more wealthy than the neighborhood, he/she should also have a higher value home also, so the "MDEV" is higher.</p>
+<p>For "LSTAT", LSTAT is the percentage of all Boston homeowners who have a greater net worth than homeowners in the neighborhood. If it is higher, it means the homeowner lives in a neighborhood that is in average less wealthy than the whole Boston area, the home in this neighborhood should have less value, so the "MDEV" is lower.</p>
 <p>For "PTRATIO", the higher the ratio means each teacher needs to cover more students, so each student should get less effort/resource of education from school, this should have high correlation to a worse school destrict. A worse school destrict means worse housing price also. So the higher the "PTRATIO", the lower the home value "MDEV" should be.</p>
 
 </div>
@@ -2287,8 +2287,8 @@ iIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiCxa/xe1lupkEBB1wAAAAABJRU5ErkJggg==
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Answer: </strong>max_depth = 3.  The score of Training and Testing are very close, both near 0.8, the gap  between Training Score and Testing Score are very small, and the score is on the high side (much better than max_depth = 1), representing a good fitting model.</p>
-<p>"What happens to the score of the training curve as more training points are added? What about the testing curve? Would having more training points benefit the model?" The score of training curve will stay around 0.8, decrease very minimal amount. The score of testing curve will also stay slightly below training curve, increase very small amount. Basically the gap between them won't change that much with adding more training points. From the figure max_dpepths = 3 after 300 Training points, the fitting performance has already saturated, very little room to improve with adding more training points.</p>
+<p><strong>Answer: </strong>max_depth = 3. When initally with only one training point, the training score is perfect (= 1) but with a very poor testing score (~ 0, can even be minus value). As more training points are added, the training score starts to decrease but the testing scores increases sharply also, reducing the gap between them. After training points larger than 300, the two scores are very close, both near 0.8 (much better than max_depth = 1), representing a good fitting model.</p>
+<p>"What happens to the score of the training curve as more training points are added? What about the testing curve? Would having more training points benefit the model?" The score of training curve will stay around 0.8, decrease very minimal amount. The score of testing curve will also stay slightly below training curve, increase very small amount. Basically the gap between them won't change that much with adding more training points. From the figure max_dpepths = 3 after 300 Training points, the fitting performance has already saturated, adding more training points will not benefit the model.</p>
 
 </div>
 </div>
