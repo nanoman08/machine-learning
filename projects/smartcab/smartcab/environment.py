@@ -127,7 +127,7 @@ class Environment(object):
 
         start_heading = random.choice(self.valid_headings)
         distance = self.compute_dist(start, destination)
-        deadline = distance * 5 # 5 time steps per intersection away
+        deadline = distance * 8 # 5 time steps per intersection away
         if(self.verbose == True): # Debugging
             print "Environment.reset(): Trial set up with start = {}, destination = {}, deadline = {}".format(start, destination, deadline)
 
@@ -282,7 +282,7 @@ class Environment(object):
         violation = 0
 
         # Reward scheme
-        # First initialize reward uniformly random from [-1, 1]
+        # First initialize reward uniformly random from [-1, 1], why need to be randomized initially?
         reward = 2 * random.random() - 1
 
         # Create a penalty factor as a function of remaining deadline
@@ -334,9 +334,10 @@ class Environment(object):
         # Did the agent attempt a valid move?
         if violation == 0:
             if action == agent.get_next_waypoint(): # Was it the correct action?
+               # reward += 2 - penalty # (2, 1)
                 reward += 2 - penalty # (2, 1)
             elif action == None and light != 'green': # Was the agent stuck at a red light?
-                reward += 2 - penalty # (2, 1)
+                reward += 1 - penalty # (2, 1)
             else: # Valid but incorrect
                 reward += 1 - penalty # (1, 0)
 
@@ -359,6 +360,7 @@ class Environment(object):
 
         # Did agent reach the goal after a valid move?
         if agent is self.primary_agent:
+
             if state['location'] == state['destination']:
                 # Did agent get to destination before deadline?
                 if state['deadline'] >= 0:

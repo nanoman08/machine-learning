@@ -4,15 +4,12 @@ from environment import Agent, Environment
 from planner import RoutePlanner
 from simulator import Simulator
 import pygame
-import pandas as pd
-import numpy as np
-import os
 
 class LearningAgent(Agent):
     """ An agent that learns to drive in the Smartcab world.
         This is the object you will be modifying. """ 
     # valid_actions = [None, 'forward', 'left', 'right']
-    def __init__(self, env, learning=False, epsilon=1.0, alpha=0.5, decay_rate = -0.025, Qini = 0):
+    def __init__(self, env, learning=False, epsilon=1.0, alpha=0.9, Qini = 0):
         super(LearningAgent, self).__init__(env)     # Set the agent in the evironment 
         self.planner = RoutePlanner(self.env, self)  # Create a route planner
         self.valid_actions = self.env.valid_actions  # The set of valid actions
@@ -23,10 +20,7 @@ class LearningAgent(Agent):
         self.epsilon = epsilon   # Random exploration factor
         self.alpha = alpha       # Learning factor
         self.initialQ = Qini
-        self.decay_rate = decay_rate
-        self.previous_state = None
-        self.previous_action = None
-        self.previous_reward = 0
+        self.decay_rate = 0.05
 
         ###########
         ## TO DO ##
@@ -61,10 +55,7 @@ class LearningAgent(Agent):
         return None
 
     def epsilon_decay(self):
-        if self.decay_rate > 0:
-            self.epsilon = self.epsilon - self.decay_rate
-        else:
-            self.epsilon = self.epsilon*np.exp(self.decay_rate)
+        self.epsilon = self.epsilon - self.decay_rate
               
         
     def build_state(self):
@@ -80,18 +71,8 @@ class LearningAgent(Agent):
         ########### 
         ## TO DO ##
         ###########
-        # Set 'state' as a tuple of relevant data for the agent 
-        # the state consists of "waypoint" + "light" +"oncoming traffinc" + "left traffic"
-
-        #if inputs['right'] != "forward":
-        #    inputs['right'] = "not forward"
-        #if inputs['left'] == "right":
-        #    inputs['left'] = None
-        #print "input format {}".format(inputs)
-        state = tuple([waypoint] + inputs.values()[0:2]+inputs.values()[3:4])
-        
-        #state = tuple([waypoint] + inputs.values())
-        print "state format {}".format(state)
+        # Set 'state' as a tuple of relevant data for the agent        
+        state = tuple([waypoint] + inputs.values()[0:3])
 
         return state
 
@@ -179,15 +160,12 @@ class LearningAgent(Agent):
         # When learning, implement the value iteration update rule
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
         #ind = self.valid_actions.index(action)
-        if state != None:
-            max_Q, ind2 = self.get_maxQ(next_state)
-            max_Q = 0
-            reward = reward + max_Q
-            self.Q[state][action] = \
-            self.Q[state][action]*(1-self.alpha) + reward*self.alpha
-        else:
-            print "first state"
-                  
+        max_Q, ind2 = self.get_maxQ(next_state)
+        reward = reward + max_Q
+        self.Q[state][action] = self.Q[state][action]*(1-self.alpha) + reward*self.alpha
+
+            
+
         return
 
 
@@ -200,13 +178,9 @@ class LearningAgent(Agent):
         self.createQ(state)                 # Create 'state' in Q-table
         action = self.choose_action(state)  # Choose an action
         reward = self.env.act(self, action) # Receive a reward
-
-#        self.learn(self.previous_state, state, self.previous_reward, self.previous_action) # Q-learn
-        self.learn(state, state, reward, action) # Q-learn
-
-        self.previous_state = state
-        self.previous_reward = reward
-        self.previous_action = action
+        next_state = self.build_state()
+        self.createQ(next_state)
+        self.learn(state, next_state, reward, action) # Q-learn
         print self.epsilon
 
         return
@@ -230,7 +204,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent, learning = True, alpha = 0.4, decay_rate = -0.0375)
+    agent = env.create_agent(LearningAgent, learning = False, alpha = 0.5)
     
     ##############
     # Follow the driving agent
@@ -245,78 +219,15 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    sim = Simulator(env, update_delay = 0.001, log_metrics = True, display= False, optimized = True)
+    sim = Simulator(env, update_delay = 0.01, log_metrics = True, display= True)
     
     ##############
     # Run the simulator
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test = 10, tolerance=0.05)
+    sim.run(n_test = 10)
 
-def multiple_run():
-    """ Driving function for running the simulation. 
-        Press ESC to close the simulation, or [SPACE] to pause the simulation. """
-    alpha_all = [float(i+5)/10 for i in xrange(3)]
-    #decay_rate_all = [-0.1, -0.075, -0.05, -0.025]
-    decay_rate_all = [0.02, 0.01]
-    ##############
-    # Create the environment
-    # Flags:
-    #   verbose     - set to True to display additional output from the simulation
-    #   num_dummies - discrete number of dummy agents in the environment, default is 100
-    #   grid_size   - discrete number of intersections (columns, rows), default is (8, 6)
-    start = 0
-    learning = True
-    optimization = True
-    
-    for alpha in alpha_all:
-        for decay_rate in decay_rate_all:
-            env = Environment(verbose = True)
-    
-    ##############
-    # Create the driving agent
-    # Flags:
-    #   learning   - set to True to force the driving agent to use Q-learning
-    #    * epsilon - continuous value for the exploration factor, default is 1
-    #    * alpha   - continuous value for the learning rate, default is 0.5
-            agent = env.create_agent(LearningAgent, learning = learning, alpha = alpha, decay_rate = decay_rate)
-    
-    ##############
-    # Follow the driving agent
-    # Flags:
-    #   enforce_deadline - set to True to enforce a deadline metric
-            env.set_primary_agent(agent, enforce_deadline=True)
-
-    ##############
-    # Create the simulation
-    # Flags:
-    #   update_delay - continuous time (in seconds) between actions, default is 2.0 seconds
-    #   display      - set to False to disable the GUI if PyGame is enabled
-    #   log_metrics  - set to True to log trial and simulation results to /logs
-    #   optimized    - set to True to change the default log file name
-            sim = Simulator(env, update_delay = 0.001, log_metrics = True, display= False, optimized = True)
-    
-    ##############
-    # Run the simulator
-    # Flags:
-    #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
-    #   n_test     - discrete number of testing trials to perform, default is 0
-            sim.run(n_test = 10, tolerance=0.05)
-            if learning == True and optimization == True:
-                log_filename = os.path.join("logs", "sim_improved-learning.csv")
-                logall_filename = os.path.join("logs", "sim_improved-learning_all.csv")
-                new_data = pd.read_csv(log_filename)
-                new_data['decay'] = decay_rate
-                new_data['alpha'] = alpha
-                
-                if start == 0:
-                    new_data.to_csv(logall_filename, index = False)
-                else:
-                    alldata = pd.concat([pd.read_csv(logall_filename), new_data],ignore_index=True)
-                    alldata.to_csv(logall_filename, index = False)
-            start+=1
 
 if __name__ == '__main__':
-    #multiple_run()
     run()

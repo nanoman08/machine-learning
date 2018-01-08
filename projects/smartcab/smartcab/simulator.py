@@ -10,7 +10,7 @@ import time
 import random
 import importlib
 import csv
-
+import pygame
 class Simulator(object):
     """Simulates agents in a dynamic smartcab environment.
 
@@ -34,7 +34,7 @@ class Simulator(object):
         'gray'    : (155, 155, 155)
     }
 
-    def __init__(self, env, size=None, update_delay=2.0, display=True, log_metrics=False, optimized=False):
+    def __init__(self, env, size=None, update_delay=2.0, display=True, log_metrics=False, total_trials = 20, optimized=False):
         self.env = env
         self.size = size if size is not None else ((self.env.grid_size[0] + 1) * self.env.block_size, (self.env.grid_size[1] + 2) * self.env.block_size)
         self.width, self.height = self.size
@@ -45,6 +45,7 @@ class Simulator(object):
         self.line_color = self.colors['mustard']
         self.boundary = self.colors['black']
         self.stop_color = self.colors['crimson']
+        self.total_trials = total_trials
 
         self.quit = False
         self.start_time = None
@@ -95,11 +96,14 @@ class Simulator(object):
                 if self.optimized: # Whether the user is optimizing the parameters and decay functions
                     self.log_filename = os.path.join("logs", "sim_improved-learning.csv")
                     self.table_filename = os.path.join("logs","sim_improved-learning.txt")
+                    self.csv_filename = os.path.join("logs","sim_improved-learning2.csv")
                 else: 
                     self.log_filename = os.path.join("logs", "sim_default-learning.csv")
                     self.table_filename = os.path.join("logs","sim_default-learning.txt")
+                    self.csv_filename = os.path.join("logs","sim_default-learning2.csv")
 
                 self.table_file = open(self.table_filename, 'wb')
+                self.csv_file = open(self.csv_filename, 'wb')
             else:
                 self.log_filename = os.path.join("logs", "sim_no-learning.csv")
             
@@ -108,7 +112,7 @@ class Simulator(object):
             self.log_writer = csv.DictWriter(self.log_file, fieldnames=self.log_fields)
             self.log_writer.writeheader()
 
-    def run(self, tolerance=0.05, n_test=0):
+    def run(self, tolerance=0.05, n_test=10):
         """ Run a simulation of the environment. 
 
         'tolerance' is the minimum epsilon necessary to begin testing (if enabled)
@@ -129,7 +133,7 @@ class Simulator(object):
 
             # Flip testing switch
             if not testing:
-                if total_trials > 20: # Must complete minimum 20 training trials
+                if total_trials > self.total_trials: # Must complete minimum 20 training trials
                     if a.learning:
                         if a.epsilon < tolerance: # assumes epsilon decays to 0
                             testing = True
@@ -240,7 +244,13 @@ class Simulator(object):
                         f.write(" -- {} : {:.2f}\n".format(action, reward))
                     f.write("\n")  
                 self.table_file.close()
-
+                
+                g = self.csv_file                
+                for state, reward_action in a.Q.iteritems():
+                    for action, reward in reward_action.iteritems():
+                        g.write("{},{},{:2f}\n".format(state, action, reward))
+                        
+                self.csv_file.close()           
             self.log_file.close()
 
         print "\nSimulation ended. . . "
