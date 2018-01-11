@@ -181,7 +181,7 @@ class LearningAgent(Agent):
         #ind = self.valid_actions.index(action)
         if state != None:
             max_Q, ind2 = self.get_maxQ(next_state)
-            max_Q = 0
+            max_Q = 0  # this is because gamma is set to 0, so max_Q = gamma*max_Q = 0
             reward = reward + max_Q
             self.Q[state][action] = \
             self.Q[state][action]*(1-self.alpha) + reward*self.alpha
